@@ -12,27 +12,45 @@ model = joblib.load("deployment/mental_logreg_model.pkl")
 encoders = joblib.load("deployment/mental_encoders.pkl")
 scaler = joblib.load("deployment/mental_scaler.pkl")
 
+# Modelin eğitildiği feature isimlerini al
 feature_names = list(model.feature_names_in_)
-optimal_threshold = 0.63  # 🔥 Threshold'u gerektiğinde buradan ayarlayabilirsin
+optimal_threshold = 0.63  # 🔥 Threshold ayarı
 
-# ✅ Ön işleme fonksiyonu (encoder + scaler)
+# 🛠️ Eksik sütunlar için default değerler:
+default_values = {
+    "Country": "United States",
+    "remote_work": "No",
+    "seek_help": "No",
+    "mental_health_consequence": "No",
+    "phys_health_consequence": "No",
+    "coworkers": "Some of them",
+    "supervisor": "Yes",
+    "mental_health_interview": "No",
+    "phys_health_interview": "No",
+    "mental_vs_physical": "Dont know",
+    "obs_consequence": "No"
+}
+
+# ✅ Ön işleme fonksiyonu (encoder + scaler + eksik tamamlama + sıralama)
 def preprocess_input(data):
-    df = pd.DataFrame([data])
+    # Eksik sütunları tamamlama
+    completed_data = {col: data.get(col, default_values.get(col, "No")) for col in feature_names}
+    df = pd.DataFrame([completed_data])
 
-    # 🎯 Encoder uygula (Age hariç tüm kategorik sütunlara)
+    # ⚡ Encoder uygula (Age hariç tüm kategorik sütunlara) — TÜM SÜTUNA UYGULANDI!
     for col in df.columns:
         if col != "Age" and col in encoders:
             le = encoders[col]
             try:
-                df[col] = le.transform([df[col].values[0]])
+                df[col] = le.transform(df[col])
             except Exception as e:
                 return None, f"Encoder hatası: '{col}' sütununda '{df[col].values[0]}' değeri tanımlı değil!"
 
-    # 🎛️ Feature sırasını garanti et
+    # Feature sırasını garanti et
     df = df[feature_names]
 
-    # 📏 Ölçekleme (Scaler)
-    df_scaled = scaler.transform(df)
+    # Ölçekleme sonrası DataFrame'e çevir (feature isimleri korunur!)
+    df_scaled = pd.DataFrame(scaler.transform(df), columns=feature_names)
     return df_scaled, None
 
 # 📌 API Endpoint
@@ -46,7 +64,7 @@ def predict():
         if error:
             return jsonify({"error": error})
 
-        # 🌟 Tahmin
+        # Tahmin
         proba = model.predict_proba(X_processed)[0][1]
         pred = int(proba > optimal_threshold)
 
