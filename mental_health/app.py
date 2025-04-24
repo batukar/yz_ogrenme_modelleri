@@ -2,83 +2,85 @@ from flask import Flask, request, jsonify
 import joblib
 import pandas as pd
 from flask_cors import CORS
+from datetime import datetime
+import os
 
-# 🚀 Flask uygulamasını başlat
 app = Flask(__name__)
 CORS(app)
 
-# 💾 Model, encoder ve scaler'ı yükle
 model = joblib.load("deployment/mental_logreg_model.pkl")
 encoders = joblib.load("deployment/mental_encoders.pkl")
 scaler = joblib.load("deployment/mental_scaler.pkl")
 
-# Modelin eğitildiği feature isimlerini al
 feature_names = list(model.feature_names_in_)
-optimal_threshold = 0.63  # 🔥 Threshold ayarı
+optimal_threshold = 0.63
+output_file = "datasets/output.csv"
 
-# 🛠️ Eksik sütunlar için default değerler:
 default_values = {
     "Country": "United States",
     "remote_work": "No",
     "seek_help": "No",
+    "leave": "Very easy",
     "mental_health_consequence": "No",
     "phys_health_consequence": "No",
-    "coworkers": "Some of them",
-    "supervisor": "Yes",
     "mental_health_interview": "No",
     "phys_health_interview": "No",
     "mental_vs_physical": "Dont know",
     "obs_consequence": "No"
 }
 
-# ✅ Ön işleme fonksiyonu (encoder + scaler + eksik tamamlama + sıralama)
 def preprocess_input(data):
-    # Eksik sütunları tamamlama
     completed_data = {col: data.get(col, default_values.get(col, "No")) for col in feature_names}
     df = pd.DataFrame([completed_data])
 
-    # ⚡ Encoder uygula (Age hariç tüm kategorik sütunlara) — TÜM SÜTUNA UYGULANDI!
     for col in df.columns:
         if col != "Age" and col in encoders:
             le = encoders[col]
             try:
-                df[col] = le.transform(df[col])
+                df[col] = le.transform([df[col].values[0]])
             except Exception as e:
                 return None, f"Encoder hatası: '{col}' sütununda '{df[col].values[0]}' değeri tanımlı değil!"
-
-    # Feature sırasını garanti et
     df = df[feature_names]
-
-    # Ölçekleme sonrası DataFrame'e çevir (feature isimleri korunur!)
-    df_scaled = pd.DataFrame(scaler.transform(df), columns=feature_names)
+    df_scaled = scaler.transform(df)
     return df_scaled, None
 
-# 📌 API Endpoint
 @app.route("/predict", methods=["POST"])
 def predict():
     try:
         data = request.get_json(force=True)
         print("📥 Gelen veri:", data)
 
+        email = data.get("email")
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
         X_processed, error = preprocess_input(data)
         if error:
             return jsonify({"error": error})
 
-        # Tahmin
         proba = model.predict_proba(X_processed)[0][1]
         pred = int(proba > optimal_threshold)
+        probability_percent = round(proba * 100, 2)
 
-        print(f"📊 Olasılık: {proba:.4f} | Tahmin (Threshold {optimal_threshold}): {pred}")
+        print(f"📊 Olasılık: {probability_percent}% | Tahmin (Threshold {optimal_threshold}): {pred}")
+
+        # CSV'ye yazma:
+        new_row = pd.DataFrame([[timestamp, email, probability_percent, pred]],
+                               columns=["Tarih", "Email", "Olasılık (%)", "Sonuç (0-1)"])
+
+        if not os.path.exists(output_file):
+            new_row.to_csv(output_file, index=False)
+        else:
+            new_row.to_csv(output_file, mode='a', header=False, index=False)
+
         return jsonify({
             "prediction": pred,
-            "probability": round(proba, 4),
+            "probability": proba,
             "threshold": optimal_threshold
         })
 
     except Exception as e:
         return jsonify({"error": str(e)})
 
-# 🚀 Lokal test (isteğe bağlı)
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5001, debug=True)
 

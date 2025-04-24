@@ -5,14 +5,15 @@ import { Picker } from '@react-native-picker/picker';
 export default function HomeScreen() {
   const [email, setEmail] = useState('');
   const [age, setAge] = useState('');
-  const [gender, setGender] = useState('');
-  const [familyHistory, setFamilyHistory] = useState('');
+  const [gender, setGender] = useState<keyof typeof genderMap | ''>('');
+  const [familyHistory, setFamilyHistory] = useState<keyof typeof familyHistoryMap | ''>('');
   const [workInterfere, setWorkInterfere] = useState('');
-  const [careOptions, setCareOptions] = useState('');
+  const [careOptions, setCareOptions] = useState<keyof typeof binaryMap | ''>('');
   const [noEmployees, setNoEmployees] = useState('');
-  const [benefits, setBenefits] = useState('');
-  const [anonymity, setAnonymity] = useState('');
-  const [leave, setLeave] = useState('');
+  const [benefits, setBenefits] = useState<keyof typeof binaryMap | ''>('');
+  const [anonymity, setAnonymity] = useState<keyof typeof binaryMap | ''>('');
+  const [coworkers, setCoworkers] = useState<keyof typeof coworkersMap | ''>('');
+  const [supervisor, setSupervisor] = useState<keyof typeof supervisorMap | ''>('');
   const [result, setResult] = useState<{ prediction?: number; probability?: number; error?: string } | null>(null);
   const [error, setError] = useState('');
 
@@ -25,12 +26,6 @@ export default function HomeScreen() {
     { label: '500-1000 Kişi', value: '500-1000' },
     { label: '1000+ Kişi', value: 'More than 1000' }
   ];
-  const leaveOptions = [
-    { label: 'Çok Zor', value: 'Very difficult' },
-    { label: 'Biraz Zor', value: 'Somewhat difficult' },
-    { label: 'Biraz Kolay', value: 'Somewhat easy' },
-    { label: 'Çok Kolay', value: 'Very easy' }
-  ];
   const binaryOptions = [
     { label: 'Evet', value: 'Yes' },
     { label: 'Hayır', value: 'No' }
@@ -41,22 +36,29 @@ export default function HomeScreen() {
     { label: 'Bazen', value: 'Sometimes' },
     { label: 'Sıklıkla', value: 'Often' }
   ];
-
   const genderMap = { 'Erkek': 'Male', 'Kadın': 'Female' };
   const familyHistoryMap = { 'Var': 'Yes', 'Yok': 'No' };
   const binaryMap = { 'Evet': 'Yes', 'Hayır': 'No' };
-  const leaveMap = {
-    'Çok Zor': 'Very difficult',
-    'Biraz Zor': 'Somewhat difficult',
-    'Biraz Kolay': 'Somewhat easy',
-    'Çok Kolay': 'Very easy'
-  };
+  const coworkersMap = { 'Evet': 'Yes', 'Bazılarından': 'Some of them', 'Hayır': 'No'};
+  const supervisorMap = { 'Evet': 'Yes', 'Hayır': 'No' };
 
+
+  const validateEmail = (email: string) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(String(email).toLowerCase());
+  };
+  
   const validateInputs = () => {
-    if (!email || !age || !gender || !familyHistory || !workInterfere || !careOptions || !noEmployees || !benefits || !anonymity || !leave) {
+    if (!email || !validateEmail(email)) {
+      setError('Lütfen geçerli bir email adresi giriniz.');
+      return false;
+    }
+  
+    if (!age || !gender || !familyHistory || !workInterfere || !careOptions || !noEmployees || !benefits || !anonymity || !coworkers || !supervisor) {
       setError('Lütfen tüm alanları doldurun.');
       return false;
     }
+  
     setError('');
     return true;
   };
@@ -65,19 +67,21 @@ export default function HomeScreen() {
     if (!validateInputs()) return;
 
     try {
-      const response = await fetch('http://192.168.1.101:5001/predict', {
+      const response = await fetch('http://10.25.1.187:5001/predict', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          email: email,
           Age: parseInt(age),
-          Gender: genderMap[gender],
-          family_history: familyHistoryMap[familyHistory],
+          Gender: gender ? genderMap[gender] : '',
+          family_history: familyHistory ? familyHistoryMap[familyHistory] : '',
           work_interfere: workInterfere,
-          care_options: binaryMap[careOptions],
+          care_options: careOptions ? binaryMap[careOptions] : '',
           no_employees: noEmployees,
-          benefits: binaryMap[benefits],
-          anonymity: binaryMap[anonymity],
-          leave: leaveMap[leave],
+          benefits: benefits ? binaryMap[benefits] : '',
+          anonymity: anonymity ? binaryMap[anonymity] : '',
+          coworkers: coworkers ? coworkersMap[coworkers] : '',
+          supervisor: supervisor ? supervisorMap[supervisor] : '',
           tech_company: 'Yes',
           wellness_program: 'No'
         })
@@ -131,13 +135,13 @@ export default function HomeScreen() {
       </View>
 
       <Text style={styles.label}>🚻 Cinsiyetiniz:</Text>
-      <RadioGroup options={["Erkek", "Kadın"]} selected={gender} onSelect={setGender} />
+      <RadioGroup options={["Erkek", "Kadın"]} selected={gender} onSelect={(value) => setGender(value as keyof typeof genderMap)} label={''} />
 
       <Text style={styles.label}>🧬 Ailenizde zihinsel sağlık geçmişi var mı?</Text>
-      <RadioGroup options={["Var", "Yok"]} selected={familyHistory} onSelect={setFamilyHistory} />
+      <RadioGroup options={["Var", "Yok"]} selected={familyHistory} onSelect={(value) => setFamilyHistory(value as keyof typeof familyHistoryMap)} label={''} />
 
       <Text style={styles.label}>🏢 İş yerinizde zihinsel sağlık desteği sunuluyor mu?</Text>
-      <RadioGroup options={binaryOptions.map(opt => opt.label)} selected={careOptions} onSelect={setCareOptions} />
+      <RadioGroup options={binaryOptions.map(opt => opt.label)} selected={careOptions} onSelect={(value) => setCareOptions(value as keyof typeof binaryMap)} label={''} />
 
       <Text style={styles.label}>💼 Zihinsel sağlığınız iş performansınızı ne sıklıkla etkiliyor?</Text>
       <View style={styles.pickerContainer}>
@@ -170,12 +174,28 @@ export default function HomeScreen() {
       </View>
 
       <Text style={styles.label}>🎁 Zihinsel sağlık için ek faydalar (programlar) var mı?</Text>
-      <RadioGroup options={binaryOptions.map(opt => opt.label)} selected={benefits} onSelect={setBenefits} />
+      <RadioGroup options={binaryOptions.map(opt => opt.label)} selected={benefits} onSelect={(value) => setBenefits(value as keyof typeof binaryMap)} label={''} />
 
       <Text style={styles.label}>🕵️‍♀️ Destek alırken anonim kalabiliyor musunuz?</Text>
-      <RadioGroup options={binaryOptions.map(opt => opt.label)} selected={anonymity} onSelect={setAnonymity} />
+      <RadioGroup options={binaryOptions.map(opt => opt.label)} selected={anonymity} onSelect={(value) => setAnonymity(value as keyof typeof binaryMap)} label={''} />
 
-      <Text style={styles.label}>🗓️ Zihinsel sağlık nedeniyle izin almak ne kadar kolay?</Text>
+      <Text style={styles.label}>👥 Çalışma arkadaşlarınızdan zihinsel sağlık konusunda destek alabiliyor musunuz?</Text>
+      <RadioGroup
+        label=""
+        options={Object.keys(coworkersMap)}
+        selected={coworkers}
+        onSelect={(value) => setCoworkers(value as keyof typeof coworkersMap)}
+      />
+
+      <Text style={styles.label}>🧑‍💼 Yöneticinizden (supervisor) zihinsel sağlık konusunda destek alabiliyor musunuz?"</Text>
+      <RadioGroup
+        label=""
+        options={Object.keys(supervisorMap)}
+        selected={supervisor}
+        onSelect={(value) => setSupervisor(value as keyof typeof supervisorMap)}
+      />
+
+      {/* <Text style={styles.label}>🗓️ Zihinsel sağlık nedeniyle izin almak ne kadar kolay?</Text>
       <View style={styles.pickerContainer}>
         <Picker
           selectedValue={leave}
@@ -188,7 +208,7 @@ export default function HomeScreen() {
             <Picker.Item key={option.value} label={option.label} value={option.label} color="#000" />
           ))}
         </Picker>
-      </View>
+      </View> */}
 
       <TouchableOpacity style={styles.customButton} onPress={handleSubmit}>
         <Text style={styles.buttonText}>🔮 Tahmin Et</Text>
@@ -201,7 +221,7 @@ export default function HomeScreen() {
           <Text style={[styles.resultText, { color: result.prediction === 1 ? '#721c24' : '#155724' }]}>
             {result.prediction === 1 ? '💥 Destek Gerekli' : '✅ Destek Gerekmiyor'}
           </Text>
-          <Text>Olasılık: %{Math.round(result.probability * 100)}</Text>
+          <Text>Olasılık: %{Math.round((result.probability ?? 0) * 100)}</Text>
         </View>
       )}
 
