@@ -11,7 +11,7 @@ app = Flask(__name__)
 CORS(app)
 
 # === Model ve yardımcı dosyalar ===
-model = load_model("deployment/mental_ann_model.keras")
+model = load_model("saved_model/mental_ann_model.keras")
 
 # Encoder dosyalarını yükleme
 try:
