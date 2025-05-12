@@ -6,18 +6,81 @@ export default function HomeScreen() {
   const [email, setEmail] = useState('');
   const [age, setAge] = useState('');
   const [gender, setGender] = useState<keyof typeof genderMap | ''>('');
+  const [country, setCountry] = useState('');
   const [familyHistory, setFamilyHistory] = useState<keyof typeof familyHistoryMap | ''>('');
+  const [treatment, setTreatment] = useState<keyof typeof binaryMap | ''>('');
   const [workInterfere, setWorkInterfere] = useState('');
-  const [careOptions, setCareOptions] = useState<keyof typeof binaryMap | ''>('');
   const [noEmployees, setNoEmployees] = useState('');
+  const [remoteWork, setRemoteWork] = useState<keyof typeof binaryMap | ''>('');
+  const [techCompany, setTechCompany] = useState<keyof typeof binaryMap | ''>('');
   const [benefits, setBenefits] = useState<keyof typeof binaryMap | ''>('');
+  const [careOptions, setCareOptions] = useState<keyof typeof binaryMap | ''>('');
+  const [wellnessProgram, setWellnessProgram] = useState<keyof typeof binaryMap | ''>('');
+  const [seekHelp, setSeekHelp] = useState<keyof typeof binaryMap | ''>('');
   const [anonymity, setAnonymity] = useState<keyof typeof binaryMap | ''>('');
+  const [leave, setLeave] = useState('');
+  const [mentalHealthConsequence, setMentalHealthConsequence] = useState('');
+  const [physHealthConsequence, setPhysHealthConsequence] = useState('');
   const [coworkers, setCoworkers] = useState<keyof typeof coworkersMap | ''>('');
   const [supervisor, setSupervisor] = useState<keyof typeof supervisorMap | ''>('');
+  const [mentalHealthInterview, setMentalHealthInterview] = useState('');
+  const [physHealthInterview, setPhysHealthInterview] = useState('');
+  const [mentalVsPhysical, setMentalVsPhysical] = useState('');
+  const [obsConsequence, setObsConsequence] = useState('');
   const [result, setResult] = useState<{ prediction?: number; probability?: number; error?: string } | null>(null);
   const [error, setError] = useState('');
 
   const ageOptions = Array.from({ length: 50 }, (_, i) => (i + 16).toString());
+  const countryMap = {
+    'Amerika Birleşik Devletleri': 'United States',
+    'Kanada': 'Canada',
+    'Birleşik Krallık': 'United Kingdom',
+    'Bulgaristan': 'Bulgaria',
+    'Fransa': 'France',
+    'Portekiz': 'Portugal',
+    'Hollanda': 'Netherlands',
+    'İsviçre': 'Switzerland',
+    'Polonya': 'Poland',
+    'Avustralya': 'Australia',
+    'Almanya': 'Germany',
+    'Rusya': 'Russia',
+    'Meksika': 'Mexico',
+    'Brezilya': 'Brazil',
+    'Slovenya': 'Slovenia',
+    'Kosta Rika': 'Costa Rica',
+    'Avusturya': 'Austria',
+    'İrlanda': 'Ireland',
+    'Hindistan': 'India',
+    'Güney Afrika': 'South Africa',
+    'İtalya': 'Italy',
+    'İsveç': 'Sweden',
+    'Kolombiya': 'Colombia',
+    'Letonya': 'Latvia',
+    'Romanya': 'Romania',
+    'Belçika': 'Belgium',
+    'Yeni Zelanda': 'New Zealand',
+    'Zimbabve': 'Zimbabwe',
+    'İspanya': 'Spain',
+    'Finlandiya': 'Finland',
+    'Uruguay': 'Uruguay',
+    'İsrail': 'Israel',
+    'Bosna-Hersek': 'Bosnia and Herzegovina',
+    'Macaristan': 'Hungary',
+    'Singapur': 'Singapore',
+    'Japonya': 'Japan',
+    'Nijerya': 'Nigeria',
+    'Hırvatistan': 'Croatia',
+    'Norveç': 'Norway',
+    'Tayland': 'Thailand',
+    'Danimarka': 'Denmark',
+    'Bahamalar': 'Bahamas, The',
+    'Yunanistan': 'Greece',
+    'Moldova': 'Moldova',
+    'Gürcistan': 'Georgia',
+    'Çin': 'China',
+    'Çek Cumhuriyeti': 'Czech Republic',
+    'Filipinler': 'Philippines'
+  };
   const employeeRanges = [
     { label: '1-5 Kişi', value: '1-5' },
     { label: '6-25 Kişi', value: '6-25' },
@@ -36,12 +99,40 @@ export default function HomeScreen() {
     { label: 'Bazen', value: 'Sometimes' },
     { label: 'Sıklıkla', value: 'Often' }
   ];
-  const genderMap = { 'Erkek': 'Male', 'Kadın': 'Female' };
+  const genderMap = { 'Erkek': 'Male', 'Kadın': 'Female' , 'Diğer': 'Other' };
   const familyHistoryMap = { 'Var': 'Yes', 'Yok': 'No' };
   const binaryMap = { 'Evet': 'Yes', 'Hayır': 'No' };
   const coworkersMap = { 'Evet': 'Yes', 'Bazılarından': 'Some of them', 'Hayır': 'No'};
   const supervisorMap = { 'Evet': 'Yes', 'Hayır': 'No' };
 
+  const leaveOptions = [
+    { label: 'Çok kolay', value: 'Very easy' },
+    { label: 'Biraz kolay', value: 'Somewhat easy' },
+    { label: 'Biraz zor', value: 'Somewhat difficult' },
+    { label: 'Çok zor', value: 'Very difficult' }
+  ];
+  
+  const consequenceOptions = [
+    { label: 'Evet', value: 'Yes' },
+    { label: 'Hayır', value: 'No' },
+    { label: 'Bazen', value: "Maybe" }
+  ];
+  
+  const countryOptions = Object.entries(countryMap).map(([label, value]) => ({
+    label,
+    value
+  }));
+
+  const mentalVsPhysicalOptions = [
+    { label: 'Zihinsel sağlık daha önemli', value: 'Yes' },
+    { label: 'Fiziksel sağlık daha önemli', value: 'No' },
+    { label: 'Fikrim yok', value: "Dont know" }
+  ];
+
+  const obsConsequenceOptions = [
+    { label: 'Evet', value: 'Yes' },
+    { label: 'Hayır', value: 'No' },
+  ];
 
   const validateEmail = (email: string) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -54,8 +145,18 @@ export default function HomeScreen() {
       return false;
     }
   
-    if (!age || !gender || !familyHistory || !workInterfere || !careOptions || !noEmployees || !benefits || !anonymity || !coworkers || !supervisor) {
-      setError('Lütfen tüm alanları doldurun.');
+    const requiredFields = [
+      age, gender, country, familyHistory, treatment, workInterfere, noEmployees,
+      remoteWork, techCompany, benefits, careOptions, wellnessProgram,
+      seekHelp, anonymity, leave, mentalHealthConsequence, physHealthConsequence,
+      coworkers, supervisor, mentalHealthInterview, physHealthInterview,
+      mentalVsPhysical, obsConsequence
+    ];
+  
+    const missing = requiredFields.some(field => field === '' || field === null || field === undefined);
+  
+    if (missing) {
+      setError('Lütfen tüm alanları eksiksiz doldurunuz.');
       return false;
     }
   
@@ -67,23 +168,34 @@ export default function HomeScreen() {
     if (!validateInputs()) return;
 
     try {
-      const response = await fetch('http://10.25.1.187:5001/predict', {
+      const response = await fetch('http://172.20.10.6:5001/predict', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: email,
           Age: parseInt(age),
           Gender: gender ? genderMap[gender] : '',
+          Country: country,
           family_history: familyHistory ? familyHistoryMap[familyHistory] : '',
+          treatment: treatment ? binaryMap[treatment] : '',
           work_interfere: workInterfere,
-          care_options: careOptions ? binaryMap[careOptions] : '',
           no_employees: noEmployees,
+          remote_work: remoteWork ? binaryMap[remoteWork] : '',
+          tech_company: techCompany ? binaryMap[techCompany] : '',
           benefits: benefits ? binaryMap[benefits] : '',
+          care_options: careOptions ? binaryMap[careOptions] : '',
+          wellness_program: wellnessProgram ? binaryMap[wellnessProgram] : '',
+          seek_help: seekHelp ? binaryMap[seekHelp] : '',
           anonymity: anonymity ? binaryMap[anonymity] : '',
+          leave: leave,
+          mental_health_consequence: mentalHealthConsequence,
+          phys_health_consequence: physHealthConsequence,
           coworkers: coworkers ? coworkersMap[coworkers] : '',
           supervisor: supervisor ? supervisorMap[supervisor] : '',
-          tech_company: 'Yes',
-          wellness_program: 'No'
+          mental_health_interview: mentalHealthInterview,
+          phys_health_interview: physHealthInterview,
+          mental_vs_physical: mentalVsPhysical,
+          obs_consequence: obsConsequence,
         })
       });
       const data = await response.json();
@@ -110,6 +222,7 @@ export default function HomeScreen() {
   return (
     <ScrollView contentContainerStyle={[styles.container, { paddingBottom: 80 }]} keyboardShouldPersistTaps="handled">
       <Text style={styles.title}>🧠 Zihinsel Sağlık Tahmini</Text>
+      
       <Text style={styles.label}>📧 Lütfen email adresinizi giriniz:</Text>
       <TextInput
         style={styles.input}
@@ -119,6 +232,7 @@ export default function HomeScreen() {
         onChangeText={setEmail}
         keyboardType="email-address"
       />
+
       <Text style={styles.label}>🎂 Yaşınız (16-65 arası):</Text>
       <View style={styles.pickerContainer}>
         <Picker
@@ -135,11 +249,34 @@ export default function HomeScreen() {
       </View>
 
       <Text style={styles.label}>🚻 Cinsiyetiniz:</Text>
-      <RadioGroup options={["Erkek", "Kadın"]} selected={gender} onSelect={(value) => setGender(value as keyof typeof genderMap)} label={''} />
+      <RadioGroup options={Object.keys(genderMap)} selected={gender} onSelect={(value) => setGender(value as keyof typeof genderMap)} label={''} />
+
+      <Text style={styles.label}>🌍 Ülkenizi seçiniz:</Text>
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={country}
+          onValueChange={setCountry}
+          style={Platform.OS === 'ios' ? styles.pickerIOS : styles.pickerAndroid}
+          mode="dropdown"
+        >
+          <Picker.Item label="Ülke Seçiniz" value="" color="#999" />
+          {countryOptions.map(c => (
+            <Picker.Item key={c.value} label={c.label} value={c.value} color="#000" />
+          ))}
+        </Picker>
+      </View>
 
       <Text style={styles.label}>🧬 Ailenizde zihinsel sağlık geçmişi var mı?</Text>
       <RadioGroup options={["Var", "Yok"]} selected={familyHistory} onSelect={(value) => setFamilyHistory(value as keyof typeof familyHistoryMap)} label={''} />
 
+      <Text style={styles.label}>🩺 Daha önce zihinsel sağlık desteği aldınız mı?</Text>
+      <RadioGroup
+        label=""
+        options={Object.keys(binaryMap)}
+        selected={treatment}
+        onSelect={(value) => setTreatment(value as keyof typeof binaryMap)}
+      />
+      
       <Text style={styles.label}>🏢 İş yerinizde zihinsel sağlık desteği sunuluyor mu?</Text>
       <RadioGroup options={binaryOptions.map(opt => opt.label)} selected={careOptions} onSelect={(value) => setCareOptions(value as keyof typeof binaryMap)} label={''} />
 
@@ -173,11 +310,88 @@ export default function HomeScreen() {
         </Picker>
       </View>
 
+      <Text style={styles.label}>🏠 Uzaktan çalışıyor musunuz?</Text>
+      <RadioGroup
+        label=""
+        options={Object.keys(binaryMap)}
+        selected={remoteWork}
+        onSelect={(value) => setRemoteWork(value as keyof typeof binaryMap)}
+      />
+
+      <Text style={styles.label}>💻 Çalıştığınız yer bir teknoloji şirketi mi?</Text>
+      <RadioGroup
+        label=""
+        options={Object.keys(binaryMap)}
+        selected={techCompany}
+        onSelect={(value) => setTechCompany(value as keyof typeof binaryMap)}
+      />
+
       <Text style={styles.label}>🎁 Zihinsel sağlık için ek faydalar (programlar) var mı?</Text>
       <RadioGroup options={binaryOptions.map(opt => opt.label)} selected={benefits} onSelect={(value) => setBenefits(value as keyof typeof binaryMap)} label={''} />
 
+      <Text style={styles.label}>🧘‍♂️ İş yerinizde sağlık programları sunuluyor mu?</Text>
+      <RadioGroup
+        label=""
+        options={Object.keys(binaryMap)}
+        selected={wellnessProgram}
+        onSelect={(value) => setWellnessProgram(value as keyof typeof binaryMap)}
+      />
+
+      <Text style={styles.label}>🩺 İş yeriniz profesyonel yardım almaya teşvik ediyor mu?</Text>
+      <RadioGroup
+        label=""
+        options={Object.keys(binaryMap)}
+        selected={seekHelp}
+        onSelect={(value) => setSeekHelp(value as keyof typeof binaryMap)}
+      />
+
       <Text style={styles.label}>🕵️‍♀️ Destek alırken anonim kalabiliyor musunuz?</Text>
       <RadioGroup options={binaryOptions.map(opt => opt.label)} selected={anonymity} onSelect={(value) => setAnonymity(value as keyof typeof binaryMap)} label={''} />
+
+      <Text style={styles.label}>🗓️ Zihinsel sağlık nedeniyle izin almak ne kadar kolay?</Text>
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={leave}
+          onValueChange={setLeave}
+          style={Platform.OS === 'ios' ? styles.pickerIOS : styles.pickerAndroid}
+          mode="dropdown"
+        >
+          <Picker.Item label="Seçiniz" value="" color="#999" />
+          {leaveOptions.map(option => (
+            <Picker.Item key={option.value} label={option.label} value={option.value} color="#000" />
+          ))}
+        </Picker>
+      </View>
+
+      <Text style={styles.label}>🧠 Zihinsel sağlık probleminin iş yerinde sonuçları olur mu?</Text>
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={mentalHealthConsequence}
+          onValueChange={setMentalHealthConsequence}
+          style={Platform.OS === 'ios' ? styles.pickerIOS : styles.pickerAndroid}
+          mode="dropdown"
+        >
+          <Picker.Item label="Seçiniz" value="" color="#999" />
+          {consequenceOptions.map(option => (
+            <Picker.Item key={option.value} label={option.label} value={option.value} color="#000" />
+          ))}
+        </Picker>
+      </View>
+
+      <Text style={styles.label}>💪 Fiziksel sağlık probleminin iş yerinde sonuçları olur mu?</Text>
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={physHealthConsequence}
+          onValueChange={setPhysHealthConsequence}
+          style={Platform.OS === 'ios' ? styles.pickerIOS : styles.pickerAndroid}
+          mode="dropdown"
+        >
+          <Picker.Item label="Seçiniz" value="" color="#999" />
+          {consequenceOptions.map(option => (
+            <Picker.Item key={option.value} label={option.label} value={option.value} color="#000" />
+          ))}
+        </Picker>
+      </View>
 
       <Text style={styles.label}>👥 Çalışma arkadaşlarınızdan zihinsel sağlık konusunda destek alabiliyor musunuz?</Text>
       <RadioGroup
@@ -195,20 +409,67 @@ export default function HomeScreen() {
         onSelect={(value) => setSupervisor(value as keyof typeof supervisorMap)}
       />
 
-      {/* <Text style={styles.label}>🗓️ Zihinsel sağlık nedeniyle izin almak ne kadar kolay?</Text>
+      <Text style={styles.label}>🗣️ İş görüşmesinde zihinsel sağlık hakkında konuşur musunuz?</Text>
       <View style={styles.pickerContainer}>
         <Picker
-          selectedValue={leave}
-          onValueChange={setLeave}
+          selectedValue={mentalHealthInterview}
+          onValueChange={setMentalHealthInterview}
           style={Platform.OS === 'ios' ? styles.pickerIOS : styles.pickerAndroid}
           mode="dropdown"
         >
           <Picker.Item label="Seçiniz" value="" color="#999" />
-          {leaveOptions.map(option => (
-            <Picker.Item key={option.value} label={option.label} value={option.label} color="#000" />
+          {consequenceOptions.map(option => (
+            <Picker.Item key={option.value} label={option.label} value={option.value} color="#000" />
           ))}
         </Picker>
-      </View> */}
+      </View>
+
+      <Text style={styles.label}>🩺 İş görüşmesinde fiziksel sağlık hakkında konuşur musunuz?</Text>
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={physHealthInterview}
+          onValueChange={setPhysHealthInterview}
+          style={Platform.OS === 'ios' ? styles.pickerIOS : styles.pickerAndroid}
+          mode="dropdown"
+        >
+          <Picker.Item label="Seçiniz" value="" color="#999" />
+          {consequenceOptions.map(option => (
+            <Picker.Item key={option.value} label={option.label} value={option.value} color="#000" />
+          ))}
+        </Picker>
+      </View>
+
+
+      <Text style={styles.label}>⚖️ Sizce zihinsel sağlık mı daha önemli, fiziksel sağlık mı?</Text>
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={mentalVsPhysical}
+          onValueChange={setMentalVsPhysical}
+          style={Platform.OS === 'ios' ? styles.pickerIOS : styles.pickerAndroid}
+          mode="dropdown"
+        >
+          <Picker.Item label="Seçiniz" value="" color="#999" />
+          {mentalVsPhysicalOptions.map(option => (
+            <Picker.Item key={option.value} label={option.label} value={option.value} color="#000" />
+          ))}
+        </Picker>
+      </View>
+
+      <Text style={styles.label}>🚨 Zihinsel sağlık sorunlarını belirtmek iş yerinde olumsuz sonuçlara yol açar mı?</Text>
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={obsConsequence}
+          onValueChange={setObsConsequence}
+          style={Platform.OS === 'ios' ? styles.pickerIOS : styles.pickerAndroid}
+          mode="dropdown"
+        >
+          <Picker.Item label="Seçiniz" value="" color="#999" />
+          {obsConsequenceOptions.map(option => (
+            <Picker.Item key={option.value} label={option.label} value={option.value} color="#000" />
+          ))}
+        </Picker>
+      </View>
+
 
       <TouchableOpacity style={styles.customButton} onPress={handleSubmit}>
         <Text style={styles.buttonText}>🔮 Tahmin Et</Text>
@@ -219,7 +480,9 @@ export default function HomeScreen() {
       {result && !result.error && (
         <View style={[styles.result, { backgroundColor: result.prediction === 1 ? '#f8d7da' : '#d4edda' }]}>
           <Text style={[styles.resultText, { color: result.prediction === 1 ? '#721c24' : '#155724' }]}>
-            {result.prediction === 1 ? '💥 Destek Gerekli' : '✅ Destek Gerekmiyor'}
+          {result.prediction === 1 
+            ? 'Bir uzmandan destek almanız önerilir.'
+            : 'Her şey yolunda görünüyor, ancak kendinizi dinlemeyi ve gözlemlemeyi unutmayın.'}
           </Text>
           <Text>Olasılık: %{Math.round((result.probability ?? 0) * 100)}</Text>
         </View>
