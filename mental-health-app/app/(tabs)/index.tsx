@@ -168,7 +168,7 @@ export default function HomeScreen() {
     if (!validateInputs()) return;
 
     try {
-      const response = await fetch('http://172.20.10.6:5001/predict', {
+      const response = await fetch('http://10.25.1.187:5001/predict', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
