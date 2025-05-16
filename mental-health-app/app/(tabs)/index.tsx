@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, ScrollView, TouchableOpacity, Platform, StatusBar, SafeAreaView } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 
 export default function HomeScreen() {
@@ -220,282 +220,295 @@ export default function HomeScreen() {
   );
 
   return (
-    <ScrollView contentContainerStyle={[styles.container, { paddingBottom: 80 }]} keyboardShouldPersistTaps="handled">
-      <Text style={styles.title}>🧠 Zihinsel Sağlık Tahmini</Text>
-      
-      <Text style={styles.label}>📧 Lütfen email adresinizi giriniz:</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        placeholderTextColor="#999"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-      />
+    <SafeAreaView style={{ flex: 1 }}>
+    <StatusBar barStyle="dark-content" backgroundColor="#FFF" />
+      <View style={styles.container}>
+        <Text style={styles.title}>🧠 Zihinsel Sağlık Tahmini</Text>
 
-      <Text style={styles.label}>🎂 Yaşınız (16-65 arası):</Text>
-      <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={age}
-          onValueChange={setAge}
-          style={Platform.OS === 'ios' ? styles.pickerIOS : styles.pickerAndroid}
-          mode="dropdown"
-        >
-          <Picker.Item label="Yaş Seçiniz" value="" color="#999" />
-          {ageOptions.map(a => (
-            <Picker.Item key={a} label={a} value={a} color="#000" />
-          ))}
-        </Picker>
+        <ScrollView contentContainerStyle={[styles.container, { paddingBottom: 80 }]} keyboardShouldPersistTaps="handled">
+
+          <Text style={styles.label}>📧 Lütfen email adresinizi giriniz:</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            placeholderTextColor="#999"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+          />
+
+          <Text style={styles.label}>🎂 Yaşınız (16-65 arası):</Text>
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={age}
+              onValueChange={setAge}
+              style={Platform.OS === 'ios' ? styles.pickerIOS : styles.pickerAndroid}
+              mode="dropdown"
+            >
+              <Picker.Item label="Yaş Seçiniz" value="" color="#999" />
+              {ageOptions.map(a => (
+                <Picker.Item key={a} label={a} value={a} color="#000" />
+              ))}
+            </Picker>
+          </View>
+
+          <Text style={styles.label}>🚻 Cinsiyetiniz:</Text>
+          <RadioGroup options={Object.keys(genderMap)} selected={gender} onSelect={(value) => setGender(value as keyof typeof genderMap)} label={''} />
+
+          <Text style={styles.label}>🌍 Ülkenizi seçiniz:</Text>
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={country}
+              onValueChange={setCountry}
+              style={Platform.OS === 'ios' ? styles.pickerIOS : styles.pickerAndroid}
+              mode="dropdown"
+            >
+              <Picker.Item label="Ülke Seçiniz" value="" color="#999" />
+              {countryOptions.map(c => (
+                <Picker.Item key={c.value} label={c.label} value={c.value} color="#000" />
+              ))}
+            </Picker>
+          </View>
+
+          <Text style={styles.label}>🧬 Ailenizde zihinsel sağlık geçmişi var mı?</Text>
+          <RadioGroup options={["Var", "Yok"]} selected={familyHistory} onSelect={(value) => setFamilyHistory(value as keyof typeof familyHistoryMap)} label={''} />
+
+          <Text style={styles.label}>🩺 Daha önce zihinsel sağlık desteği aldınız mı?</Text>
+          <RadioGroup
+            label=""
+            options={Object.keys(binaryMap)}
+            selected={treatment}
+            onSelect={(value) => setTreatment(value as keyof typeof binaryMap)}
+          />
+          
+          <Text style={styles.label}>🏢 İş yerinizde zihinsel sağlık desteği sunuluyor mu?</Text>
+          <RadioGroup options={binaryOptions.map(opt => opt.label)} selected={careOptions} onSelect={(value) => setCareOptions(value as keyof typeof binaryMap)} label={''} />
+
+          <Text style={styles.label}>💼 Zihinsel sağlığınız iş performansınızı ne sıklıkla etkiliyor?</Text>
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={workInterfere}
+              onValueChange={setWorkInterfere}
+              style={Platform.OS === 'ios' ? styles.pickerIOS : styles.pickerAndroid}
+              mode="dropdown"
+            >
+              <Picker.Item label="Seçiniz" value="" color="#999" />
+              {workInterfereOptions.map(option => (
+                <Picker.Item key={option.value} label={option.label} value={option.value} color="#000" />
+              ))}
+            </Picker>
+          </View>
+
+          <Text style={styles.label}>👥 Çalıştığınız şirketin büyüklüğü nedir?</Text>
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={noEmployees}
+              onValueChange={setNoEmployees}
+              style={Platform.OS === 'ios' ? styles.pickerIOS : styles.pickerAndroid}
+              mode="dropdown"
+            >
+              <Picker.Item label="Seçiniz" value="" color="#999" />
+              {employeeRanges.map(range => (
+                <Picker.Item key={range.value} label={range.label} value={range.value} color="#000" />
+              ))}
+            </Picker>
+          </View>
+
+          <Text style={styles.label}>🏠 Uzaktan çalışıyor musunuz?</Text>
+          <RadioGroup
+            label=""
+            options={Object.keys(binaryMap)}
+            selected={remoteWork}
+            onSelect={(value) => setRemoteWork(value as keyof typeof binaryMap)}
+          />
+
+          <Text style={styles.label}>💻 Çalıştığınız yer bir teknoloji şirketi mi?</Text>
+          <RadioGroup
+            label=""
+            options={Object.keys(binaryMap)}
+            selected={techCompany}
+            onSelect={(value) => setTechCompany(value as keyof typeof binaryMap)}
+          />
+
+          <Text style={styles.label}>🎁 Zihinsel sağlık için ek faydalar (programlar) var mı?</Text>
+          <RadioGroup options={binaryOptions.map(opt => opt.label)} selected={benefits} onSelect={(value) => setBenefits(value as keyof typeof binaryMap)} label={''} />
+
+          <Text style={styles.label}>🧘‍♂️ İş yerinizde sağlık programları sunuluyor mu?</Text>
+          <RadioGroup
+            label=""
+            options={Object.keys(binaryMap)}
+            selected={wellnessProgram}
+            onSelect={(value) => setWellnessProgram(value as keyof typeof binaryMap)}
+          />
+
+          <Text style={styles.label}>🩺 İş yeriniz profesyonel yardım almaya teşvik ediyor mu?</Text>
+          <RadioGroup
+            label=""
+            options={Object.keys(binaryMap)}
+            selected={seekHelp}
+            onSelect={(value) => setSeekHelp(value as keyof typeof binaryMap)}
+          />
+
+          <Text style={styles.label}>🕵️‍♀️ Destek alırken anonim kalabiliyor musunuz?</Text>
+          <RadioGroup options={binaryOptions.map(opt => opt.label)} selected={anonymity} onSelect={(value) => setAnonymity(value as keyof typeof binaryMap)} label={''} />
+
+          <Text style={styles.label}>🗓️ Zihinsel sağlık nedeniyle izin almak ne kadar kolay?</Text>
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={leave}
+              onValueChange={setLeave}
+              style={Platform.OS === 'ios' ? styles.pickerIOS : styles.pickerAndroid}
+              mode="dropdown"
+            >
+              <Picker.Item label="Seçiniz" value="" color="#999" />
+              {leaveOptions.map(option => (
+                <Picker.Item key={option.value} label={option.label} value={option.value} color="#000" />
+              ))}
+            </Picker>
+          </View>
+
+          <Text style={styles.label}>🧠 Zihinsel sağlık probleminin iş yerinde sonuçları olur mu?</Text>
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={mentalHealthConsequence}
+              onValueChange={setMentalHealthConsequence}
+              style={Platform.OS === 'ios' ? styles.pickerIOS : styles.pickerAndroid}
+              mode="dropdown"
+            >
+              <Picker.Item label="Seçiniz" value="" color="#999" />
+              {consequenceOptions.map(option => (
+                <Picker.Item key={option.value} label={option.label} value={option.value} color="#000" />
+              ))}
+            </Picker>
+          </View>
+
+          <Text style={styles.label}>💪 Fiziksel sağlık probleminin iş yerinde sonuçları olur mu?</Text>
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={physHealthConsequence}
+              onValueChange={setPhysHealthConsequence}
+              style={Platform.OS === 'ios' ? styles.pickerIOS : styles.pickerAndroid}
+              mode="dropdown"
+            >
+              <Picker.Item label="Seçiniz" value="" color="#999" />
+              {consequenceOptions.map(option => (
+                <Picker.Item key={option.value} label={option.label} value={option.value} color="#000" />
+              ))}
+            </Picker>
+          </View>
+
+          <Text style={styles.label}>👥 Çalışma arkadaşlarınızdan zihinsel sağlık konusunda destek alabiliyor musunuz?</Text>
+          <RadioGroup
+            label=""
+            options={Object.keys(coworkersMap)}
+            selected={coworkers}
+            onSelect={(value) => setCoworkers(value as keyof typeof coworkersMap)}
+          />
+
+          <Text style={styles.label}>🧑‍💼 Yöneticinizden (supervisor) zihinsel sağlık konusunda destek alabiliyor musunuz?"</Text>
+          <RadioGroup
+            label=""
+            options={Object.keys(supervisorMap)}
+            selected={supervisor}
+            onSelect={(value) => setSupervisor(value as keyof typeof supervisorMap)}
+          />
+
+          <Text style={styles.label}>🗣️ İş görüşmesinde zihinsel sağlık hakkında konuşur musunuz?</Text>
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={mentalHealthInterview}
+              onValueChange={setMentalHealthInterview}
+              style={Platform.OS === 'ios' ? styles.pickerIOS : styles.pickerAndroid}
+              mode="dropdown"
+            >
+              <Picker.Item label="Seçiniz" value="" color="#999" />
+              {consequenceOptions.map(option => (
+                <Picker.Item key={option.value} label={option.label} value={option.value} color="#000" />
+              ))}
+            </Picker>
+          </View>
+
+          <Text style={styles.label}>🩺 İş görüşmesinde fiziksel sağlık hakkında konuşur musunuz?</Text>
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={physHealthInterview}
+              onValueChange={setPhysHealthInterview}
+              style={Platform.OS === 'ios' ? styles.pickerIOS : styles.pickerAndroid}
+              mode="dropdown"
+            >
+              <Picker.Item label="Seçiniz" value="" color="#999" />
+              {consequenceOptions.map(option => (
+                <Picker.Item key={option.value} label={option.label} value={option.value} color="#000" />
+              ))}
+            </Picker>
+          </View>
+
+
+          <Text style={styles.label}>⚖️ Sizce zihinsel sağlık mı daha önemli, fiziksel sağlık mı?</Text>
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={mentalVsPhysical}
+              onValueChange={setMentalVsPhysical}
+              style={Platform.OS === 'ios' ? styles.pickerIOS : styles.pickerAndroid}
+              mode="dropdown"
+            >
+              <Picker.Item label="Seçiniz" value="" color="#999" />
+              {mentalVsPhysicalOptions.map(option => (
+                <Picker.Item key={option.value} label={option.label} value={option.value} color="#000" />
+              ))}
+            </Picker>
+          </View>
+
+          <Text style={styles.label}>🚨 Zihinsel sağlık sorunlarını belirtmek iş yerinde olumsuz sonuçlara yol açar mı?</Text>
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={obsConsequence}
+              onValueChange={setObsConsequence}
+              style={Platform.OS === 'ios' ? styles.pickerIOS : styles.pickerAndroid}
+              mode="dropdown"
+            >
+              <Picker.Item label="Seçiniz" value="" color="#999" />
+              {obsConsequenceOptions.map(option => (
+                <Picker.Item key={option.value} label={option.label} value={option.value} color="#000" />
+              ))}
+            </Picker>
+          </View>
+
+
+          <TouchableOpacity style={styles.customButton} onPress={handleSubmit}>
+            <Text style={styles.buttonText}>🔮 Tahmin Et</Text>
+          </TouchableOpacity>
+
+          {error !== '' && <Text style={styles.error}>❌ {error}</Text>}
+
+          {result && !result.error && (
+            <View style={[styles.result, { backgroundColor: result.prediction === 1 ? '#f8d7da' : '#d4edda' }]}>
+              <Text style={[styles.resultText, { color: result.prediction === 1 ? '#721c24' : '#155724' }]}>
+              {result.prediction === 1 
+                ? 'Bir uzmandan destek almanız önerilir.'
+                : 'Her şey yolunda görünüyor, ancak kendinizi dinlemeyi ve gözlemlemeyi unutmayın.'}
+              </Text>
+              <Text>Olasılık: %{Math.round((result.probability ?? 0) * 100)}</Text>
+            </View>
+          )}
+
+          {result?.error && <Text style={styles.error}>❌ Hata: {result.error}</Text>}
+        </ScrollView>
       </View>
-
-      <Text style={styles.label}>🚻 Cinsiyetiniz:</Text>
-      <RadioGroup options={Object.keys(genderMap)} selected={gender} onSelect={(value) => setGender(value as keyof typeof genderMap)} label={''} />
-
-      <Text style={styles.label}>🌍 Ülkenizi seçiniz:</Text>
-      <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={country}
-          onValueChange={setCountry}
-          style={Platform.OS === 'ios' ? styles.pickerIOS : styles.pickerAndroid}
-          mode="dropdown"
-        >
-          <Picker.Item label="Ülke Seçiniz" value="" color="#999" />
-          {countryOptions.map(c => (
-            <Picker.Item key={c.value} label={c.label} value={c.value} color="#000" />
-          ))}
-        </Picker>
-      </View>
-
-      <Text style={styles.label}>🧬 Ailenizde zihinsel sağlık geçmişi var mı?</Text>
-      <RadioGroup options={["Var", "Yok"]} selected={familyHistory} onSelect={(value) => setFamilyHistory(value as keyof typeof familyHistoryMap)} label={''} />
-
-      <Text style={styles.label}>🩺 Daha önce zihinsel sağlık desteği aldınız mı?</Text>
-      <RadioGroup
-        label=""
-        options={Object.keys(binaryMap)}
-        selected={treatment}
-        onSelect={(value) => setTreatment(value as keyof typeof binaryMap)}
-      />
-      
-      <Text style={styles.label}>🏢 İş yerinizde zihinsel sağlık desteği sunuluyor mu?</Text>
-      <RadioGroup options={binaryOptions.map(opt => opt.label)} selected={careOptions} onSelect={(value) => setCareOptions(value as keyof typeof binaryMap)} label={''} />
-
-      <Text style={styles.label}>💼 Zihinsel sağlığınız iş performansınızı ne sıklıkla etkiliyor?</Text>
-      <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={workInterfere}
-          onValueChange={setWorkInterfere}
-          style={Platform.OS === 'ios' ? styles.pickerIOS : styles.pickerAndroid}
-          mode="dropdown"
-        >
-          <Picker.Item label="Seçiniz" value="" color="#999" />
-          {workInterfereOptions.map(option => (
-            <Picker.Item key={option.value} label={option.label} value={option.value} color="#000" />
-          ))}
-        </Picker>
-      </View>
-
-      <Text style={styles.label}>👥 Çalıştığınız şirketin büyüklüğü nedir?</Text>
-      <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={noEmployees}
-          onValueChange={setNoEmployees}
-          style={Platform.OS === 'ios' ? styles.pickerIOS : styles.pickerAndroid}
-          mode="dropdown"
-        >
-          <Picker.Item label="Seçiniz" value="" color="#999" />
-          {employeeRanges.map(range => (
-            <Picker.Item key={range.value} label={range.label} value={range.value} color="#000" />
-          ))}
-        </Picker>
-      </View>
-
-      <Text style={styles.label}>🏠 Uzaktan çalışıyor musunuz?</Text>
-      <RadioGroup
-        label=""
-        options={Object.keys(binaryMap)}
-        selected={remoteWork}
-        onSelect={(value) => setRemoteWork(value as keyof typeof binaryMap)}
-      />
-
-      <Text style={styles.label}>💻 Çalıştığınız yer bir teknoloji şirketi mi?</Text>
-      <RadioGroup
-        label=""
-        options={Object.keys(binaryMap)}
-        selected={techCompany}
-        onSelect={(value) => setTechCompany(value as keyof typeof binaryMap)}
-      />
-
-      <Text style={styles.label}>🎁 Zihinsel sağlık için ek faydalar (programlar) var mı?</Text>
-      <RadioGroup options={binaryOptions.map(opt => opt.label)} selected={benefits} onSelect={(value) => setBenefits(value as keyof typeof binaryMap)} label={''} />
-
-      <Text style={styles.label}>🧘‍♂️ İş yerinizde sağlık programları sunuluyor mu?</Text>
-      <RadioGroup
-        label=""
-        options={Object.keys(binaryMap)}
-        selected={wellnessProgram}
-        onSelect={(value) => setWellnessProgram(value as keyof typeof binaryMap)}
-      />
-
-      <Text style={styles.label}>🩺 İş yeriniz profesyonel yardım almaya teşvik ediyor mu?</Text>
-      <RadioGroup
-        label=""
-        options={Object.keys(binaryMap)}
-        selected={seekHelp}
-        onSelect={(value) => setSeekHelp(value as keyof typeof binaryMap)}
-      />
-
-      <Text style={styles.label}>🕵️‍♀️ Destek alırken anonim kalabiliyor musunuz?</Text>
-      <RadioGroup options={binaryOptions.map(opt => opt.label)} selected={anonymity} onSelect={(value) => setAnonymity(value as keyof typeof binaryMap)} label={''} />
-
-      <Text style={styles.label}>🗓️ Zihinsel sağlık nedeniyle izin almak ne kadar kolay?</Text>
-      <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={leave}
-          onValueChange={setLeave}
-          style={Platform.OS === 'ios' ? styles.pickerIOS : styles.pickerAndroid}
-          mode="dropdown"
-        >
-          <Picker.Item label="Seçiniz" value="" color="#999" />
-          {leaveOptions.map(option => (
-            <Picker.Item key={option.value} label={option.label} value={option.value} color="#000" />
-          ))}
-        </Picker>
-      </View>
-
-      <Text style={styles.label}>🧠 Zihinsel sağlık probleminin iş yerinde sonuçları olur mu?</Text>
-      <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={mentalHealthConsequence}
-          onValueChange={setMentalHealthConsequence}
-          style={Platform.OS === 'ios' ? styles.pickerIOS : styles.pickerAndroid}
-          mode="dropdown"
-        >
-          <Picker.Item label="Seçiniz" value="" color="#999" />
-          {consequenceOptions.map(option => (
-            <Picker.Item key={option.value} label={option.label} value={option.value} color="#000" />
-          ))}
-        </Picker>
-      </View>
-
-      <Text style={styles.label}>💪 Fiziksel sağlık probleminin iş yerinde sonuçları olur mu?</Text>
-      <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={physHealthConsequence}
-          onValueChange={setPhysHealthConsequence}
-          style={Platform.OS === 'ios' ? styles.pickerIOS : styles.pickerAndroid}
-          mode="dropdown"
-        >
-          <Picker.Item label="Seçiniz" value="" color="#999" />
-          {consequenceOptions.map(option => (
-            <Picker.Item key={option.value} label={option.label} value={option.value} color="#000" />
-          ))}
-        </Picker>
-      </View>
-
-      <Text style={styles.label}>👥 Çalışma arkadaşlarınızdan zihinsel sağlık konusunda destek alabiliyor musunuz?</Text>
-      <RadioGroup
-        label=""
-        options={Object.keys(coworkersMap)}
-        selected={coworkers}
-        onSelect={(value) => setCoworkers(value as keyof typeof coworkersMap)}
-      />
-
-      <Text style={styles.label}>🧑‍💼 Yöneticinizden (supervisor) zihinsel sağlık konusunda destek alabiliyor musunuz?"</Text>
-      <RadioGroup
-        label=""
-        options={Object.keys(supervisorMap)}
-        selected={supervisor}
-        onSelect={(value) => setSupervisor(value as keyof typeof supervisorMap)}
-      />
-
-      <Text style={styles.label}>🗣️ İş görüşmesinde zihinsel sağlık hakkında konuşur musunuz?</Text>
-      <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={mentalHealthInterview}
-          onValueChange={setMentalHealthInterview}
-          style={Platform.OS === 'ios' ? styles.pickerIOS : styles.pickerAndroid}
-          mode="dropdown"
-        >
-          <Picker.Item label="Seçiniz" value="" color="#999" />
-          {consequenceOptions.map(option => (
-            <Picker.Item key={option.value} label={option.label} value={option.value} color="#000" />
-          ))}
-        </Picker>
-      </View>
-
-      <Text style={styles.label}>🩺 İş görüşmesinde fiziksel sağlık hakkında konuşur musunuz?</Text>
-      <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={physHealthInterview}
-          onValueChange={setPhysHealthInterview}
-          style={Platform.OS === 'ios' ? styles.pickerIOS : styles.pickerAndroid}
-          mode="dropdown"
-        >
-          <Picker.Item label="Seçiniz" value="" color="#999" />
-          {consequenceOptions.map(option => (
-            <Picker.Item key={option.value} label={option.label} value={option.value} color="#000" />
-          ))}
-        </Picker>
-      </View>
-
-
-      <Text style={styles.label}>⚖️ Sizce zihinsel sağlık mı daha önemli, fiziksel sağlık mı?</Text>
-      <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={mentalVsPhysical}
-          onValueChange={setMentalVsPhysical}
-          style={Platform.OS === 'ios' ? styles.pickerIOS : styles.pickerAndroid}
-          mode="dropdown"
-        >
-          <Picker.Item label="Seçiniz" value="" color="#999" />
-          {mentalVsPhysicalOptions.map(option => (
-            <Picker.Item key={option.value} label={option.label} value={option.value} color="#000" />
-          ))}
-        </Picker>
-      </View>
-
-      <Text style={styles.label}>🚨 Zihinsel sağlık sorunlarını belirtmek iş yerinde olumsuz sonuçlara yol açar mı?</Text>
-      <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={obsConsequence}
-          onValueChange={setObsConsequence}
-          style={Platform.OS === 'ios' ? styles.pickerIOS : styles.pickerAndroid}
-          mode="dropdown"
-        >
-          <Picker.Item label="Seçiniz" value="" color="#999" />
-          {obsConsequenceOptions.map(option => (
-            <Picker.Item key={option.value} label={option.label} value={option.value} color="#000" />
-          ))}
-        </Picker>
-      </View>
-
-
-      <TouchableOpacity style={styles.customButton} onPress={handleSubmit}>
-        <Text style={styles.buttonText}>🔮 Tahmin Et</Text>
-      </TouchableOpacity>
-
-      {error !== '' && <Text style={styles.error}>❌ {error}</Text>}
-
-      {result && !result.error && (
-        <View style={[styles.result, { backgroundColor: result.prediction === 1 ? '#f8d7da' : '#d4edda' }]}>
-          <Text style={[styles.resultText, { color: result.prediction === 1 ? '#721c24' : '#155724' }]}>
-          {result.prediction === 1 
-            ? 'Bir uzmandan destek almanız önerilir.'
-            : 'Her şey yolunda görünüyor, ancak kendinizi dinlemeyi ve gözlemlemeyi unutmayın.'}
-          </Text>
-          <Text>Olasılık: %{Math.round((result.probability ?? 0) * 100)}</Text>
-        </View>
-      )}
-
-      {result?.error && <Text style={styles.error}>❌ Hata: {result.error}</Text>}
-    </ScrollView>
+  </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { padding: 20, backgroundColor: '#fff', flexGrow: 1 },
-  title: { margin: 46, fontSize: 26, fontWeight: 'bold', marginBottom: 30, textAlign: 'center', color: '#333' },
+  title: { 
+    marginTop: 20,  // Daha küçük bir üst boşluk
+    fontSize: 26, 
+    fontWeight: 'bold', 
+    marginBottom: 30, 
+    textAlign: 'center', 
+    color: '#333' 
+  },
   input: {
     borderWidth: 1, borderColor: '#aaa', borderRadius: 6, padding: 10, marginBottom: 12,
     backgroundColor: '#f9f9f9', color: '#000'
